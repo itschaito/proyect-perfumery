@@ -1,0 +1,42 @@
+[
+    { 
+        "id": 1, 
+        "name": "Brisa de Medianoche", 
+        "notes": "Sándalo, Vainilla, Ámbar", 
+        "description": "Una fragancia misteriosa con toques orientales, perfecta para la noche. Evoca tranquilidad y profundidad.", 
+        "price": 89.99,
+        "imageUrl": "https://www.miti.com.gt/assets/images/products/ADzoPbjM9aTxwBXy/Brises/MiTienda-Belcorp-Brises-2.jpg" 
+    },
+    { 
+        "id": 2, 
+        "name": "Brisa de Medianoche", 
+        "notes": "Sándalo, Vainilla, Ámbar", 
+        "description": "Una fragancia misteriosa con toques orientales, perfecta para la noche. Evoca tranquilidad y profundidad.", 
+        "price": 89.99,
+        "imageUrl": "https://www.miti.com.gt/assets/images/products/ADzoPbjM9aTxwBXy/Brises/MiTienda-Belcorp-Brises-2.jpg" 
+    },
+    { 
+        "id": 3, 
+        "name": "Brisa de Medianoche", 
+        "notes": "Sándalo, Vainilla, Ámbar", 
+        "description": "Una fragancia misteriosa con toques orientales, perfecta para la noche. Evoca tranquilidad y profundidad.", 
+        "price": 89.99,
+        "imageUrl": "https://www.miti.com.gt/assets/images/products/ADzoPbjM9aTxwBXy/Brises/MiTienda-Belcorp-Brises-2.jpg" 
+    },
+    { 
+        "id": 4, 
+        "name": "Brisa de Medianoche", 
+        "notes": "Sándalo, Vainilla, Ámbar", 
+        "description": "Una fragancia misteriosa con toques orientales, perfecta para la noche. Evoca tranquilidad y profundidad.", 
+        "price": 89.99,
+        "imageUrl": "https://www.miti.com.gt/assets/images/products/ADzoPbjM9aTxwBXy/Brises/MiTienda-Belcorp-Brises-2.jpg" 
+    },
+    { 
+        "id": 5, 
+        "name": "Brisa de Medianoche", 
+        "notes": "Sándalo, Vainilla, Ámbar", 
+        "description": "Una fragancia misteriosa con toques orientales, perfecta para la noche. Evoca tranquilidad y profundidad.", 
+        "price": 89.99,
+        "imageUrl": "https://www.miti.com.gt/assets/images/products/ADzoPbjM9aTxwBXy/Brises/MiTienda-Belcorp-Brises-2.jpg" 
+    }
+]
