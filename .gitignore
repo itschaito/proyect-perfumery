@@ -1,0 +1,33 @@
+# =========================================================
+# IGNORAR CARPETAS DE DEPENDENCIAS Y COMPILACIÓN
+# =========================================================
+# Módulos de Node para el Backend
+/backend/node_modules
+
+# Módulos de Node para el Frontend
+/frontend/node_modules
+
+# Carpetas de compilación de React (si construyes la app)
+/frontend/build
+/frontend/dist
+
+# =========================================================
+# IGNORAR ARCHIVOS SENSIBLES Y DE ENTORNO
+# =========================================================
+# Archivo de variables de entorno (¡CRUCIAL para el JWT_SECRET!)
+# Nunca subas tus claves secretas a Git.
+.env
+/backend/.env
+
+# =========================================================
+# IGNORAR ARCHIVOS DE REGISTRO Y CACHÉ
+# =========================================================
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.DS_Store
+*.log
+.vscode/
+
+# Ignorar archivos de lock generados por sistemas operativos
+Thumbs.db
