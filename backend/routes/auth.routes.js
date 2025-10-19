@@ -8,6 +8,7 @@ router.post('/login', async (req, res) => {
     const { username, password } = req.body;
 
     // VALIDACIÓN (SIMULADA SIN BASE DE DATOS)
+    //aloh
     const ADMIN_USERNAME = process.env.ADMIN_USERNAME;
     const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD; 
 
