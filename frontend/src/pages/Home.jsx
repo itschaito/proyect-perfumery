@@ -11,7 +11,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api/productos';
+const API_URL = '/api/productos';
 
 // Estilo del Modal (Tamaño ajustado para MD: 700px)
 const modalStyle = {

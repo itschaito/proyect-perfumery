@@ -6,7 +6,7 @@ import { useAuth } from '../context/useAuth';
 import axios from 'axios'; 
 
 // URL de tu endpoint de login (ajusta si es necesario)
-const LOGIN_API_URL = 'http://localhost:5000/api/auth/login'; 
+const LOGIN_API_URL = '/api/auth/login';
 
 const AdminLogin = () => {
     const [username, setUsername] = useState('admin'); // Puedes pre-llenar el usuario para facilitar las pruebas
