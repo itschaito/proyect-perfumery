@@ -1,119 +1,251 @@
+// frontend/src/components/ProductForm.jsx (¡VERSION FINAL Y MODIFICADA CON BLOQUEO DE CAMPOS!)
 import React, { useState, useEffect } from 'react';
-import { 
-    Container, Box, Typography, TextField, Button, Alert 
-} from '@mui/material';
-import { useParams, useNavigate } from 'react-router-dom';
+import { Container, Typography, Box, TextField, Button, Grid, Paper } from '@mui/material';
+import { Save } from '@mui/icons-material';
 import axios from 'axios';
-import { useAuth } from '../context/useAuth';
+import { useNavigate, useParams } from 'react-router-dom'; // Para obtener el ID
+import { useAuth } from '../context/useAuth'; 
 
-const API_PRODUCTS_URL = 'http://localhost:5000/api/productos'; // Obtener detalle para editar
-const API_ADMIN_URL = 'http://localhost:5000/api/admin/productos'; // POST/PUT CRUD
+// URLs absolutas
+const API_BASE_URL = 'http://localhost:5000/api/admin/productos'; // POST, PUT (Token)
+const API_PUBLIC_URL = 'http://localhost:5000/api/productos'; // GET (Sin Token)
 
-const ProductForm = ({ action }) => {
-    const { id } = useParams(); // Para modo 'edit'
-    const navigate = useNavigate();
-    const { getAuthToken } = useAuth();
-    const token = getAuthToken();
-    
+const ProductForm = ({ action = 'add' }) => {
+    const { id } = useParams(); // ID solo existe si la ruta es /admin/editar/:id
+
     const [formData, setFormData] = useState({
-        name: '', notes: '', description: '', price: '', imageUrl: ''
+        name: '',
+        price: '',
+        image: '',
+        notes: '', 
+        description: '',
+        stock: '',
     });
-    const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
+    const [initialLoad, setInitialLoad] = useState(action === 'edit');
+    
+    const navigate = useNavigate();
+    const { getAuthToken } = useAuth(); 
 
-    const isEdit = action === 'edit';
-    const pageTitle = isEdit ? `Editar Producto ID: ${id}` : 'Agregar Nuevo Producto';
-
-    // Cargar datos si estamos en modo Edición
+    // Cargar los datos del producto existente (SOLO PARA EDICIÓN)
     useEffect(() => {
-        if (isEdit) {
+        if (action === 'edit' && id) {
             const fetchProduct = async () => {
-                setLoading(true);
                 try {
-                    // Nota: Usamos la ruta pública GET para obtener los detalles
-                    const response = await axios.get(`${API_PRODUCTS_URL}?id=${id}`); 
-                    const product = response.data.find(p => p.id === parseInt(id));
-                    
-                    if (product) {
-                        setFormData({
-                            name: product.name || '',
-                            notes: product.notes || '',
-                            description: product.description || '',
-                            price: product.price || '',
-                            imageUrl: product.imageUrl || ''
-                        });
-                    }
+                    const response = await axios.get(`${API_PUBLIC_URL}/${id}`);
+                    const product = response.data;
+
+                    // Formatear notas: de array a string para el TextField
+                    const notesString = Array.isArray(product.notes) ? product.notes.join(', ') : (product.notes || '');
+
+                    setFormData({
+                        name: product.name || '',
+                        price: product.price || '',
+                        // Fallback por si en el JSON antiguo usa 'imageUrl'
+                        image: product.image || product.imageUrl || '', 
+                        notes: notesString,
+                        description: product.description || '',
+                        stock: product.stock || 0,
+                    });
+                    setInitialLoad(false); 
                 } catch (err) {
-                    console.error('Error al cargar el producto para editar:', err);
-                    setError('No se pudo cargar el producto para editar.');
+                    console.error('Error al cargar el producto para edición:', err);
+                    setError('No se pudo cargar la información del producto. Verifique la ID y el backend.'); 
+                    setInitialLoad(false);
                 }
-                setLoading(false);
             };
             fetchProduct();
+        } else if (action === 'add') {
+            setInitialLoad(false);
         }
-    }, [isEdit, id]);
-
+    }, [action, id]); 
+    
+    // Manejar cambio en los campos
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData(prev => ({ 
-            ...prev, 
-            [name]: name === 'price' ? parseFloat(value) : value 
-        }));
+        setFormData(prev => ({ ...prev, [name]: value }));
     };
 
+    // Manejar el envío (POST para agregar, PUT para editar)
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
+        setLoading(true);
+
+        const token = getAuthToken(); 
+        if (!token) {
+            setError('Error: Sesión expirada. Por favor, inicie sesión de nuevo.');
+            setLoading(false);
+            return;
+        }
+
+        const productData = { ...formData };
+        
+        // Determinar URL y Método
+        const url = action === 'edit' ? `${API_BASE_URL}/${id}` : API_BASE_URL;
+        const method = action === 'edit' ? 'put' : 'post';
 
         try {
-            if (!token) throw new Error("No autenticado. Por favor, inicie sesión.");
+            await axios({
+                method: method,
+                url: url,
+                data: productData,
+                headers: { 
+                    'Authorization': `Bearer ${token}` 
+                }
+            });
+            
+            navigate('/admin'); 
 
-            if (isEdit) {
-                // PUT para editar
-                await axios.put(`${API_ADMIN_URL}/${id}`, formData, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
-                alert('Producto actualizado con éxito!');
-            } else {
-                // POST para agregar
-                await axios.post(API_ADMIN_URL, formData, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
-                alert('Producto agregado con éxito!');
-            }
-            navigate('/admin'); // Regresar al dashboard
         } catch (err) {
-            setError(err.response?.data?.message || err.message || 'Error al guardar el producto.');
+            const msg = err.response?.data?.message || `Error al ${action === 'edit' ? 'actualizar' : 'guardar'}. Verifique los campos.`;
+            setError(msg);
+        } finally {
+            setLoading(false);
         }
     };
-
-    if (loading) return <Container sx={{ mt: 8 }}><Typography>Cargando formulario...</Typography></Container>;
-
+    
+    const title = action === 'add' ? 'AGREGAR NUEVO PRODUCTO' : `EDITAR PRODUCTO ID: ${id}`;
+    
+    // Estado de carga inicial
+    if (initialLoad) {
+        return (
+            <Container sx={{ mt: 5 }}>
+                <Typography align="center" variant="h5">Cargando datos del producto...</Typography>
+            </Container>
+        );
+    }
+    
+    // La variable 'isEdit' nos ayuda a deshabilitar campos
+    const isEdit = action === 'edit';
+    
     return (
-        <Container component="main" maxWidth="sm" sx={{ mt: 8 }}>
-            <Box 
-                sx={{ 
-                    p: 4, 
-                    boxShadow: 3, 
-                    borderRadius: 2, 
-                    backgroundColor: 'white' 
-                }}
-            >
-                <Typography variant="h4" sx={{ mb: 4, color: 'primary.main' }}>
-                    {pageTitle}
-                </Typography>
+        <Container component={Paper} elevation={3} sx={{ mt: 5, p: 4, maxWidth: '800px' }}>
+            <Typography variant="h4" gutterBottom align="center" sx={{ color: 'primary.main', mb: 4 }}>
+                {title}
+            </Typography>
 
-                {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
-
-                <Box component="form" onSubmit={handleSubmit}>
-                    <TextField fullWidth required label="Nombre" name="name" value={formData.name} onChange={handleChange} sx={{ mb: 2 }} />
-                    <TextField fullWidth required label="Precio" name="price" type="number" value={formData.price} onChange={handleChange} sx={{ mb: 2 }} />
-                    <TextField fullWidth label="URL de Imagen" name="imageUrl" value={formData.imageUrl} onChange={handleChange} sx={{ mb: 2 }} />
-                    <TextField fullWidth label="Notas Olfativas" name="notes" value={formData.notes} onChange={handleChange} sx={{ mb: 2 }} />
-                    <TextField fullWidth label="Descripción Detallada" name="description" multiline rows={4} value={formData.description} onChange={handleChange} sx={{ mb: 3 }} />
+            <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
+                <Grid container spacing={3}>
                     
-                    <Button type="submit" variant="contained" color="primary" fullWidth>
-                        {isEdit ? 'Guardar Cambios' : 'Crear Producto'}
+                    {/* ID del Producto */}
+                    {isEdit && (
+                        <Grid item xs={12}>
+                            <TextField fullWidth label="ID del Producto" name="id" value={id} disabled />
+                        </Grid>
+                    )}
+                    
+                    {/* Nombre (BLOQUEADO EN EDICIÓN) */}
+                    <Grid item xs={12} sm={6}>
+                        <TextField 
+                            required 
+                            fullWidth 
+                            label="Nombre del Producto" 
+                            name="name" 
+                            value={formData.name} 
+                            onChange={handleChange} 
+                            disabled={isEdit} // <-- CAMPO DESHABILITADO
+                            helperText={isEdit ? "El nombre no se puede editar." : ""}
+                        />
+                    </Grid>
+                    
+                    {/* Precio (EDITABLE) */}
+                    <Grid item xs={12} sm={6}>
+                        <TextField 
+                            required 
+                            fullWidth 
+                            label="Precio (Solo números)" 
+                            name="price" 
+                            type="number" 
+                            value={formData.price} 
+                            onChange={handleChange} 
+                            inputProps={{ step: "0.01" }} 
+                        />
+                    </Grid>
+
+                    {/* URL de Imagen (BLOQUEADO EN EDICIÓN) */}
+                    <Grid item xs={12} sm={6}>
+                        <TextField 
+                            required 
+                            fullWidth 
+                            label="URL de Imagen" 
+                            name="image" 
+                            value={formData.image} 
+                            onChange={handleChange} 
+                            disabled={isEdit} // <-- CAMPO DESHABILITADO
+                            helperText={isEdit ? "La imagen no se puede editar." : ""}
+                        />
+                    </Grid>
+                    
+                    {/* Stock (EDITABLE) */}
+                    <Grid item xs={12} sm={6}>
+                        <TextField 
+                            required 
+                            fullWidth 
+                            label="Stock" 
+                            name="stock" 
+                            type="number" 
+                            value={formData.stock} 
+                            onChange={handleChange} 
+                        />
+                    </Grid>
+
+                    {/* Notas Olfativas (BLOQUEADO EN EDICIÓN) */}
+                    <Grid item xs={12}>
+                        <TextField 
+                            required 
+                            fullWidth 
+                            label="Notas Olfativas (ej. rosa, madera, cítrico)" 
+                            name="notes" 
+                            value={formData.notes} 
+                            onChange={handleChange} 
+                            multiline 
+                            disabled={isEdit} // <-- CAMPO DESHABILITADO
+                            helperText={isEdit ? "Las notas no se pueden editar." : ""}
+                        />
+                    </Grid>
+
+                    {/* Descripción (BLOQUEADO EN EDICIÓN) */}
+                    <Grid item xs={12}>
+                        <TextField 
+                            required 
+                            fullWidth 
+                            label="Descripción del Producto" 
+                            name="description" 
+                            value={formData.description} 
+                            onChange={handleChange} 
+                            multiline 
+                            rows={4} 
+                            disabled={isEdit} // <-- CAMPO DESHABILITADO
+                            helperText={isEdit ? "La descripción no se puede editar." : ""}
+                        />
+                    </Grid>
+                </Grid>
+
+                {/* Mensaje de Error */}
+                {error && (
+                    <Typography color="error" variant="body1" sx={{ mt: 2 }}>
+                        {error}
+                    </Typography>
+                )}
+
+                {/* Botones */}
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 4, gap: 2 }}>
+                    <Button 
+                        variant="outlined" 
+                        onClick={() => navigate('/admin')}
+                        disabled={loading}
+                    >
+                        Cancelar
+                    </Button>
+                    <Button
+                        type="submit"
+                        variant="contained"
+                        startIcon={<Save />}
+                        disabled={loading}
+                    >
+                        {loading ? 'GUARDANDO...' : (isEdit ? 'ACTUALIZAR PRODUCTO' : 'GUARDAR PRODUCTO')}
                     </Button>
                 </Box>
             </Box>

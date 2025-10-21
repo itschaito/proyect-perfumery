@@ -1,4 +1,4 @@
-
+// backend/routes/auth.routes.js (CORREGIDO)
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
@@ -8,7 +8,6 @@ router.post('/login', async (req, res) => {
     const { username, password } = req.body;
 
     // VALIDACIÓN (SIMULADA SIN BASE DE DATOS)
-    //aloh
     const ADMIN_USERNAME = process.env.ADMIN_USERNAME;
     const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD; 
 
@@ -19,9 +18,10 @@ router.post('/login', async (req, res) => {
     // Generar el Token JWT
     const token = jwt.sign(
         { id: 1, role: 'admin' }, 
-        process.env.JWT_SECRET,
-        { expiresIn: '1h' } // El token expira en 1 hora
+        process.env.JWT_SECRET // ¡YA NO HAY OPCIÓN DE EXPIRACIÓN!
     );
+
+    // 💡 NOTA: Asegúrate de que process.env.JWT_SECRET sea la MISMA clave que usas en el middleware de autenticación.
 
     res.json({ token, role: 'admin', message: 'Inicio de sesión exitoso.' });
 });

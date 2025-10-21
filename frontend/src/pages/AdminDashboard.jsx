@@ -1,14 +1,16 @@
+// frontend/src/pages/AdminDashboard.jsx
 import React, { useState, useEffect } from 'react';
 import { 
-    Container, Typography, Box, Button, Grid, Paper, 
+    Container, Typography, Box, Button, Paper, 
     Table, TableBody, TableCell, TableContainer, TableHead, 
     TableRow, IconButton, Alert 
 } from '@mui/material';
 import { Add, Edit, Delete } from '@mui/icons-material';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { useAuth } from '../context/useAuth'; // Para obtener el token
+import { useAuth } from '../context/useAuth'; 
 
+// --- URLs ABSOLUTAS CORREGIDAS PARA CONSISTENCIA ---
 const API_PRODUCTS_URL = 'http://localhost:5000/api/productos'; // GET público
 const API_ADMIN_URL = 'http://localhost:5000/api/admin/productos'; // Rutas CRUD
 
@@ -28,7 +30,7 @@ const AdminDashboard = () => {
             setLoading(false);
         } catch (err) {
             console.error('Error al cargar la lista de productos:', err);
-            setError('Error al cargar la lista de productos.');
+            setError('Error al cargar la lista de productos. Verifique la conexión al backend.');
             setLoading(false);
         }
     };
@@ -47,21 +49,21 @@ const AdminDashboard = () => {
             setMessage(`Producto ID ${id} eliminado con éxito.`);
             fetchProducts(); // Recargar la lista
         } catch (err) {
-            setError(err.response?.data?.message || 'Error al eliminar el producto. ¿Token expirado?');
+            setError(err.response?.data?.message || 'Error al eliminar. Asegúrese de estar logeado.');
         }
     };
 
+    // Al montar el componente, cargamos la lista
     useEffect(() => {
         fetchProducts();
-    }, []);
+    }, []); 
 
     if (loading) return <Container sx={{ mt: 8 }}><Typography>Cargando Dashboard...</Typography></Container>;
 
-    // --- Renderizado ---
     return (
         <Container sx={{ mt: 8, mb: 4 }}>
             <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
-                <Typography variant="h4" sx={{ color: 'primary.main' }}>
+                <Typography variant="h4" sx={{ color: 'primary.main', fontWeight: 700 }}>
                     Panel de Administración de Productos
                 </Typography>
                 <Button 
@@ -75,18 +77,20 @@ const AdminDashboard = () => {
                 </Button>
             </Box>
 
+            {/* Mensajes de feedback */}
             {message && <Alert severity="success" sx={{ mb: 2 }}>{message}</Alert>}
             {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
 
             <TableContainer component={Paper} elevation={3}>
                 <Table>
-                    <TableHead sx={{ bgcolor: 'lightgray' }}>
+                    <TableHead sx={{ bgcolor: '#f5f5f5' }}>
                         <TableRow>
-                            <TableCell>ID</TableCell>
-                            <TableCell>Nombre</TableCell>
-                            <TableCell>Precio</TableCell>
-                            <TableCell>Notas Olfativas</TableCell>
-                            <TableCell align="right">Acciones</TableCell>
+                            <TableCell sx={{ fontWeight: 700 }}>ID</TableCell>
+                            <TableCell sx={{ fontWeight: 700 }}>Nombre</TableCell>
+                            <TableCell sx={{ fontWeight: 700 }}>Precio</TableCell>
+                            <TableCell sx={{ fontWeight: 700 }}>Stock</TableCell>
+                            <TableCell sx={{ fontWeight: 700 }}>Notas Olfativas</TableCell>
+                            <TableCell align="right" sx={{ fontWeight: 700 }}>Acciones</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -94,18 +98,25 @@ const AdminDashboard = () => {
                             <TableRow key={product.id} hover>
                                 <TableCell>{product.id}</TableCell>
                                 <TableCell>{product.name}</TableCell>
-                                <TableCell>${product.price.toFixed(2)}</TableCell>
-                                <TableCell>{product.notes.substring(0, 50)}...</TableCell>
+                                <TableCell>${product.price ? product.price.toFixed(2) : 'N/A'}</TableCell>
+                                <TableCell>{product.stock || 0}</TableCell>
+                                <TableCell>{
+                                    Array.isArray(product.notes) 
+                                        ? product.notes.join(', ').substring(0, 50) + '...'
+                                        : product.notes ? product.notes.substring(0, 50) + '...' : ''
+                                }</TableCell>
                                 <TableCell align="right">
                                     <IconButton 
                                         color="primary"
-                                        onClick={() => navigate(`/admin/editar/${product.id}`)} // <-- Ruta para Editar
+                                        onClick={() => navigate(`/admin/editar/${product.id}`)} 
+                                        aria-label="editar"
                                     >
                                         <Edit />
                                     </IconButton>
                                     <IconButton 
                                         color="error"
                                         onClick={() => handleDelete(product.id)}
+                                        aria-label="eliminar"
                                     >
                                         <Delete />
                                     </IconButton>
@@ -116,11 +127,12 @@ const AdminDashboard = () => {
                 </Table>
             </TableContainer>
             
-            {/* OTRAS CARACTERÍSTICAS SUGERIDAS */}
-            <Box mt={4}>
-                <Typography variant="h6">Otras Características Sugeridas:</Typography>
-                <Button variant="outlined" sx={{ mr: 2 }}>Gestionar Pedidos (Falso)</Button>
-                <Button variant="outlined">Ver Reporte de Ventas (Falso)</Button>
+            <Box mt={6} textAlign="center">
+                <Typography variant="subtitle1" color="text.secondary">
+                    Gestión de Contenido Adicional (Falso):
+                </Typography>
+                <Button variant="outlined" sx={{ mr: 2, mt: 1 }}>Gestionar Pedidos</Button>
+                <Button variant="outlined" sx={{ mt: 1 }}>Ver Reporte de Ventas</Button>
             </Box>
 
         </Container>

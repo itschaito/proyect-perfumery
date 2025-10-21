@@ -1,4 +1,4 @@
-// frontend/src/pages/Home.jsx
+// frontend/src/pages/Home.jsx (VERSIÓN FINAL Y COMPLETA)
 import React, { useState, useEffect } from 'react';
 import { 
     Container, Typography, Box, Grid, Card, CardContent, 
@@ -11,9 +11,9 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import axios from 'axios';
 
-const API_URL = '/api/productos';
+const API_URL = 'http://localhost:5000/api/productos'; 
 
-// Estilo del Modal (Tamaño ajustado para MD: 700px)
+// Estilo del Modal
 const modalStyle = {
     position: 'absolute',
     top: '50%',
@@ -29,12 +29,18 @@ const modalStyle = {
     overflowY: 'auto',
 };
 
-const Home = ({ searchTerm = '' }) => { // Recibe searchTerm, default a ''
+const Home = ({ searchTerm = '' }) => { 
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [openModal, setOpenModal] = useState(false);
-    const [selectedProduct, setSelectedProduct] = useState(null);
+    const [selectedProduct, setSelectedProduct] = useState(null); 
+    
+    // Función para obtener la URL de la imagen, con fallback para datos antiguos
+    const getProductImage = (product) => {
+        // Busca en 'image' (nuevo formato) o 'imageUrl' (posible formato antiguo)
+        return product.image || product.imageUrl || 'URL_IMAGEN_DEFAULT_AQUI'; 
+    };
 
     const handleOpen = (product) => {
         setSelectedProduct(product);
@@ -54,23 +60,20 @@ const Home = ({ searchTerm = '' }) => { // Recibe searchTerm, default a ''
                 setLoading(false);
             } catch (err) {
                 console.error("Error al cargar los productos:", err);
-                setError("No se pudieron cargar los productos. ¿Está el backend activo en :5000?");
+                setError("No se pudieron cargar los productos. Verifique la conexión al backend (puerto 5000).");
                 setLoading(false);
             }
         };
         fetchProducts();
     }, []);
 
-    // Lógica de Filtrado (busca en nombre y notas)
-    const filteredProducts = products.filter(product => 
-        product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.notes.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-
     // Renderiza las notas olfativas como chips
-    const renderNotesAsChips = (notesString) => {
-        if (!notesString) return null;
-        return notesString.split(/[\s,]+/).filter(Boolean).map((note, index) => ( 
+    const renderNotesAsChips = (notes) => {
+        const notesArray = Array.isArray(notes) 
+            ? notes 
+            : typeof notes === 'string' ? notes.split(/[\s,]+/).filter(Boolean) : [];
+        
+        return notesArray.map((note, index) => ( 
             <Chip 
                 key={index}
                 label={note.trim()}
@@ -87,9 +90,15 @@ const Home = ({ searchTerm = '' }) => { // Recibe searchTerm, default a ''
         ));
     };
 
+    // Lógica de Filtrado
+    const filteredProducts = products.filter(product => 
+        product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (product.description && product.description.toLowerCase().includes(searchTerm.toLowerCase()))
+    );
+
     if (loading) return (
         <Container sx={{ mt: 8, textAlign: 'center' }}>
-            <Typography variant="h6" color="primary">Cargando catálogo premium...</Typography>
+            <Typography variant="h6" color="primary">Cargando catálogo...</Typography>
         </Container>
     );
 
@@ -106,50 +115,35 @@ const Home = ({ searchTerm = '' }) => { // Recibe searchTerm, default a ''
                 variant="h2" 
                 component="h1" 
                 align="center" 
-                sx={{ color: 'primary.dark', fontWeight: 700, letterSpacing: 4, mb: 2 }}
+                sx={{ color: 'primary.dark', fontWeight: 700, letterSpacing: 4, mb: 6 }}
             >
                 COLECCIÓN DE FRAGANCIAS
             </Typography>
-            <Typography 
-                variant="h6" 
-                align="center" 
-                color="text.secondary" 
-                sx={{ mb: 6, fontStyle: 'italic' }}
-            >
-                Encuentra tu esencia perfecta entre nuestros productos seleccionados.
-            </Typography>
 
-            <Grid container spacing={5} justifyContent="center">
+            {/* --- Grid de Productos --- */}
+            <Grid 
+                container 
+                spacing={5} 
+                // Asegura la centralización de las tarjetas
+                justifyContent="flex-start" 
+                sx={{ mx: 'auto', maxWidth: '1400px' }} // Límite de ancho para mejor visualización
+            >
                 
-                {/* --- Manejo de Resultados y Búsqueda --- */}
-                {filteredProducts.length === 0 && searchTerm !== '' ? (
-                    <Grid item xs={12}>
-                        <Box sx={{ p: 6, border: '2px dashed #ff4081', borderRadius: 2, textAlign: 'center' }}>
-                            <Typography variant="h5" color="error">
-                                😔 Producto no encontrado. Intenta con otra búsqueda.
-                            </Typography>
-                            <Typography variant="body1" color="text.secondary" sx={{ mt: 1 }}>
-                                El término "{searchTerm}" no arrojó resultados.
-                            </Typography>
-                        </Box>
-                    </Grid>
-                ) : filteredProducts.length === 0 && products.length === 0 ? (
-                    // Catálogo vacío al inicio
+                {filteredProducts.length === 0 ? (
                     <Grid item xs={12}>
                         <Box sx={{ p: 6, border: '2px dashed #ddd', borderRadius: 2, textAlign: 'center' }}>
                             <Typography variant="h5" color="text.secondary">
-                                El catálogo está vacío. Agrega productos desde el Dashboard Admin.
+                                El catálogo está vacío o no hay resultados para "{searchTerm}".
                             </Typography>
                         </Box>
                     </Grid>
                 ) : (
-                    // Renderizar los productos filtrados (3 por fila en lg)
                     filteredProducts.map((product) => (
+                        // --- CONFIGURACIÓN PARA 3 POR FILA (md=4) ---
                         <Grid 
                             item 
                             key={product.id} 
-                            xs={12} sm={6} md={4} 
-                            lg={4} 
+                            xs={12} sm={6} md={4} lg={4} // lg=4 también asegura 3 por fila en pantallas muy grandes
                         >
                             <Card 
                                 elevation={6} 
@@ -167,7 +161,8 @@ const Home = ({ searchTerm = '' }) => { // Recibe searchTerm, default a ''
                                 <CardMedia
                                     component="img"
                                     height="320" 
-                                    image={product.imageUrl}
+                                    // --- USO DE LA FUNCIÓN CON FALLBACK ---
+                                    image={getProductImage(product)} 
                                     alt={product.name}
                                     sx={{ objectFit: 'cover', borderBottom: '1px solid #eee' }}
                                 />
@@ -182,7 +177,7 @@ const Home = ({ searchTerm = '' }) => { // Recibe searchTerm, default a ''
                                     </Typography>
                                     
                                     <Typography variant="h5" color="primary.main" sx={{ mb: 2, fontWeight: 500 }}>
-                                        ${product.price.toFixed(2)}
+                                        ${product.price ? product.price.toFixed(2) : '0.00'}
                                     </Typography>
                                     
                                     <Button
@@ -226,10 +221,14 @@ const Home = ({ searchTerm = '' }) => { // Recibe searchTerm, default a ''
                                 <Grid item xs={12} md={6}>
                                     <Box 
                                         component="img"
-                                        src={selectedProduct.imageUrl}
+                                        // Usa la función con fallback para la imagen del modal
+                                        src={getProductImage(selectedProduct)}
                                         alt={selectedProduct.name}
                                         sx={{ width: '100%', height: 'auto', borderRadius: 2, boxShadow: 6 }}
                                     />
+                                    <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+                                        Stock: {selectedProduct.stock} unidades
+                                    </Typography>
                                 </Grid>
                                 
                                 <Grid item xs={12} md={6}>
@@ -243,7 +242,7 @@ const Home = ({ searchTerm = '' }) => { // Recibe searchTerm, default a ''
                                     <Divider sx={{ my: 2, bgcolor: 'primary.dark' }} />
 
                                     <Typography variant="h5" sx={{ mt: 1, color: 'primary.light', fontWeight: 700 }}>
-                                        ${selectedProduct.price.toFixed(2)}
+                                        ${selectedProduct.price ? selectedProduct.price.toFixed(2) : '0.00'}
                                     </Typography>
                                     
                                     <Box sx={{ my: 3 }}>

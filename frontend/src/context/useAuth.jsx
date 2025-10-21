@@ -1,4 +1,4 @@
-// frontend/src/context/useAuth.jsx
+// frontend/src/context/useAuth.jsx (¡CORREGIDO!)
 import React, { createContext, useState, useContext } from 'react';
 // ... (otras importaciones) ...
 
@@ -18,14 +18,20 @@ export const AuthProvider = ({ children }) => {
         setToken(null);
     };
 
+    // --- FUNCIÓN AÑADIDA: Obtiene el token de localStorage ---
+    const getAuthToken = () => {
+        return localStorage.getItem('adminToken');
+    };
+    // --------------------------------------------------------
+
     // FUNCIÓN DE VERIFICACIÓN MEJORADA:
     const isAdminAuthenticated = () => {
-        // Verifica el token en el estado Y el token en localStorage
-        // Esto es más seguro contra errores de tiempo de renderizado.
-        return !!token || !!localStorage.getItem('adminToken');
+        // Usa getAuthToken para la verificación
+        return !!getAuthToken();
     };
 
-    const contextValue = { token, login, logout, isAdminAuthenticated };
+    // --- OBJETO DE CONTEXTO CORREGIDO: Incluye getAuthToken ---
+    const contextValue = { token, login, logout, isAdminAuthenticated, getAuthToken };
 
     return (
         <AuthContext.Provider value={contextValue}>

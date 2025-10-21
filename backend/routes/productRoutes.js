@@ -1,27 +1,23 @@
-// backend/routes/productRoutes.js
+// backend/routes/productRoutes.js (REVISADO Y CONFIRMADO)
 const express = require('express');
 const router = express.Router();
-const auth = require('../middleware/auth'); 
-const fs = require('fs/promises'); // Importa el módulo de promesas de File System
+const auth = require('../middleware/auth'); // Asegúrate que la ruta a tu middleware sea correcta
+const fs = require('fs/promises');
 const path = require('path');
 
 // Definición de la ruta al archivo JSON
 const PRODUCTS_FILE = path.join(__dirname, '..', 'data', 'productos.json');
 
-// --- Funciones de Utilidad para Leer/Escribir ---
-
-// Lee el archivo JSON y lo convierte en un array de JS
+// --- Funciones de Utilidad para Leer/Escribir ---\r\n
 const readProducts = async () => {
     try {
         const data = await fs.readFile(PRODUCTS_FILE, 'utf-8');
         return JSON.parse(data);
     } catch (error) {
-        // Si el archivo no existe o está vacío, retorna un array vacío
         return [];
     }
 };
 
-// Escribe el array de JS de vuelta al archivo JSON
 const writeProducts = async (products) => {
     await fs.writeFile(PRODUCTS_FILE, JSON.stringify(products, null, 2), 'utf-8');
 };
@@ -37,48 +33,73 @@ router.get('/productos', async (req, res) => {
 // RUTAS PROTEGIDAS (Admin)
 
 // POST /api/admin/productos -> Crear un nuevo producto
-router.post('/admin/productos', auth, async (req, res) => {
-    const products = await readProducts();
-    const { name, notes, description, price } = req.body;
-    
-    // Calcula el ID, tomando el máximo ID actual + 1
-    const newId = products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1;
+router.post('/admin/productos', auth, async (req, res) => { // Protegida con 'auth'
+    try {
+        const products = await readProducts();
+        
+        // Lógica para asignar nuevo ID
+        const newId = products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1;
+        
+        // Lógica para formatear notas
+        const notesArray = typeof req.body.notes === 'string' ? req.body.notes.split(/[\s,]+/).filter(Boolean) : [];
 
-    const newProduct = { id: newId, name, notes, description, price: Number(price) };
-    products.push(newProduct);
-    
-    await writeProducts(products); // Guarda el nuevo array en el archivo
-    res.status(201).json(newProduct);
+        // Crear el nuevo producto
+        const newProduct = {
+            id: newId,
+            ...req.body,
+            price: Number(req.body.price),
+            stock: Number(req.body.stock),
+            notes: notesArray, 
+            createdAt: new Date().toISOString()
+        };
+
+        products.push(newProduct);
+        await writeProducts(products);
+        res.status(201).json(newProduct);
+
+    } catch (error) {
+        console.error('Error al crear el producto:', error);
+        res.status(500).json({ message: 'Error interno del servidor al guardar el producto.' });
+    }
 });
 
 // PUT /api/admin/productos/:id -> Actualizar un producto existente
-router.put('/admin/productos/:id', auth, async (req, res) => {
+router.put('/admin/productos/:id', auth, async (req, res) => { // Protegida con 'auth'
     const products = await readProducts();
     const id = parseInt(req.params.id);
     const index = products.findIndex(p => p.id === id);
 
     if (index === -1) return res.status(404).json({ message: 'Producto no encontrado' });
     
-    products[index] = { ...products[index], ...req.body, id: id };
+    let updatedData = { ...req.body };
     
-    await writeProducts(products); // Guarda la actualización
+    // Asegura que los campos numéricos y las notas se manejen correctamente
+    if (updatedData.price) updatedData.price = Number(updatedData.price);
+    if (updatedData.stock) updatedData.stock = Number(updatedData.stock);
+    if (updatedData.notes && typeof updatedData.notes === 'string') {
+        updatedData.notes = updatedData.notes.split(/[\s,]+/).filter(Boolean);
+    }
+    
+    products[index] = { ...products[index], ...updatedData, id: id };
+    
+    await writeProducts(products);
     res.json(products[index]);
 });
 
 // DELETE /api/admin/productos/:id -> Eliminar un producto
-router.delete('/admin/productos/:id', auth, async (req, res) => {
+router.delete('/admin/productos/:id', auth, async (req, res) => { // Protegida con 'auth'
     let products = await readProducts();
     const id = parseInt(req.params.id);
     
     const initialLength = products.length;
     products = products.filter(p => p.id !== id);
 
-    if (products.length < initialLength) {
-        await writeProducts(products); // Guarda el array filtrado
-        return res.status(204).send();
+    if (products.length === initialLength) {
+        return res.status(404).json({ message: 'Producto no encontrado.' });
     }
     
-    res.status(404).json({ message: 'Producto no encontrado' });
+    await writeProducts(products);
+    res.json({ message: 'Producto eliminado con éxito.' });
 });
 
 module.exports = router;

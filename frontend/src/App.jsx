@@ -4,7 +4,7 @@ import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-route
 import { Box } from '@mui/material';
 
 // Corregir el navbar de netlify
-import Navbar from './components/navbar';
+import Navbar from "./components/navbar";
 import Footer from './components/Footer'; 
 import Home from './pages/Home';
 import AdminLogin from './pages/AdminLogin';

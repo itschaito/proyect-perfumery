@@ -1,42 +1,78 @@
 [
-    { 
-        "id": 1, 
-        "name": "Brisa de Medianoche", 
-        "notes": "Sándalo, Vainilla, Ámbar", 
-        "description": "Una fragancia misteriosa con toques orientales, perfecta para la noche. Evoca tranquilidad y profundidad.", 
-        "price": 89.99,
-        "imageUrl": "https://www.miti.com.gt/assets/images/products/ADzoPbjM9aTxwBXy/Brises/MiTienda-Belcorp-Brises-2.jpg" 
-    },
-    { 
-        "id": 2, 
-        "name": "Brisa de Medianoche", 
-        "notes": "Sándalo, Vainilla, Ámbar", 
-        "description": "Una fragancia misteriosa con toques orientales, perfecta para la noche. Evoca tranquilidad y profundidad.", 
-        "price": 89.99,
-        "imageUrl": "https://www.miti.com.gt/assets/images/products/ADzoPbjM9aTxwBXy/Brises/MiTienda-Belcorp-Brises-2.jpg" 
-    },
-    { 
-        "id": 3, 
-        "name": "Brisa de Medianoche", 
-        "notes": "Sándalo, Vainilla, Ámbar", 
-        "description": "Una fragancia misteriosa con toques orientales, perfecta para la noche. Evoca tranquilidad y profundidad.", 
-        "price": 89.99,
-        "imageUrl": "https://www.miti.com.gt/assets/images/products/ADzoPbjM9aTxwBXy/Brises/MiTienda-Belcorp-Brises-2.jpg" 
-    },
-    { 
-        "id": 4, 
-        "name": "Brisa de Medianoche", 
-        "notes": "Sándalo, Vainilla, Ámbar", 
-        "description": "Una fragancia misteriosa con toques orientales, perfecta para la noche. Evoca tranquilidad y profundidad.", 
-        "price": 89.99,
-        "imageUrl": "https://www.miti.com.gt/assets/images/products/ADzoPbjM9aTxwBXy/Brises/MiTienda-Belcorp-Brises-2.jpg" 
-    },
-    { 
-        "id": 5, 
-        "name": "Brisa de Medianoche", 
-        "notes": "Sándalo, Vainilla, Ámbar", 
-        "description": "Una fragancia misteriosa con toques orientales, perfecta para la noche. Evoca tranquilidad y profundidad.", 
-        "price": 89.99,
-        "imageUrl": "https://www.miti.com.gt/assets/images/products/ADzoPbjM9aTxwBXy/Brises/MiTienda-Belcorp-Brises-2.jpg" 
-    }
+  {
+    "id": 1,
+    "name": "Brisa de Medianoche",
+    "notes": "Sándalo, Vainilla, Ámbar",
+    "description": "Una fragancia misteriosa con toques orientales, perfecta para la noche. Evoca tranquilidad y profundidad.",
+    "price": 89.99,
+    "imageUrl": "https://www.miti.com.gt/assets/images/products/ADzoPbjM9aTxwBXy/Brises/MiTienda-Belcorp-Brises-2.jpg"
+  },
+  {
+    "id": 2,
+    "name": "Brisa de Medianoche",
+    "notes": "Sándalo, Vainilla, Ámbar",
+    "description": "Una fragancia misteriosa con toques orientales, perfecta para la noche. Evoca tranquilidad y profundidad.",
+    "price": 89.99,
+    "imageUrl": "https://www.miti.com.gt/assets/images/products/ADzoPbjM9aTxwBXy/Brises/MiTienda-Belcorp-Brises-2.jpg"
+  },
+  {
+    "id": 3,
+    "name": "Brisa de Medianoche",
+    "notes": "Sándalo, Vainilla, Ámbar",
+    "description": "Una fragancia misteriosa con toques orientales, perfecta para la noche. Evoca tranquilidad y profundidad.",
+    "price": 89.99,
+    "imageUrl": "https://www.miti.com.gt/assets/images/products/ADzoPbjM9aTxwBXy/Brises/MiTienda-Belcorp-Brises-2.jpg"
+  },
+  {
+    "id": 4,
+    "name": "Brisa de Medianoche",
+    "notes": "Sándalo, Vainilla, Ámbar",
+    "description": "Una fragancia misteriosa con toques orientales, perfecta para la noche. Evoca tranquilidad y profundidad.",
+    "price": 89.99,
+    "imageUrl": "https://www.miti.com.gt/assets/images/products/ADzoPbjM9aTxwBXy/Brises/MiTienda-Belcorp-Brises-2.jpg"
+  },
+  {
+    "id": 5,
+    "name": "Brisa de Medianoche",
+    "notes": "Sándalo, Vainilla, Ámbar",
+    "description": "Una fragancia misteriosa con toques orientales, perfecta para la noche. Evoca tranquilidad y profundidad.",
+    "price": 89.99,
+    "imageUrl": "https://www.miti.com.gt/assets/images/products/ADzoPbjM9aTxwBXy/Brises/MiTienda-Belcorp-Brises-2.jpg"
+  },
+  {
+    "id": 6,
+    "name": "Le male le parfum Jean Paul",
+    "notes": [
+      "no se"
+    ],
+    "description": "ola\n",
+    "price": 89.99,
+    "image": "https://m.media-amazon.com/images/I/71oGDPmn2GL._AC_SL1500_.jpg",
+    "stock": 1,
+    "createdAt": "2025-10-21T19:58:00.467Z"
+  },
+  {
+    "id": 7,
+    "name": "scandal",
+    "notes": [
+      "adqw"
+    ],
+    "description": "dawdaw",
+    "price": 99.99,
+    "image": "data:image/jpeg;base64,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",
+    "stock": 12,
+    "createdAt": "2025-10-21T20:01:15.420Z"
+  },
+  {
+    "id": 8,
+    "name": "One Millon Tradicional",
+    "price": 78.99,
+    "image": "https://medias.rabanne.com/cdn-cgi/image/width=700,quality=90/https://medias.rabanne.com/medias/sys_master/images/h1f/h6a/10571547148318/10571547082782/10571547082782.jpg",
+    "notes": [
+      "asdas"
+    ],
+    "description": "dasdasdsa",
+    "stock": 12,
+    "createdAt": "2025-10-21T21:59:06.498Z"
+  }
 ]

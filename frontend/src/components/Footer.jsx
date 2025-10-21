@@ -1,4 +1,4 @@
-// frontend/src/components/Footer.jsx (CORRECCIÓN)
+import { Link } from 'react-router-dom';
 import React from 'react';
 import { Box, Container, Typography, Grid, Button, Divider, IconButton } from '@mui/material';
 import LockIcon from '@mui/icons-material/Lock';
@@ -7,7 +7,6 @@ import StoreIcon from '@mui/icons-material/Store';
 import FacebookIcon from '@mui/icons-material/Facebook';
 import InstagramIcon from '@mui/icons-material/Instagram';
 import TikTokIcon from '@mui/icons-material/GitHub'; 
-import { Link } from 'react-router-dom'; // <-- ¡IMPORTACIÓN FALTANTE!
 
 const Footer = () => {
     
@@ -69,7 +68,7 @@ const Footer = () => {
                         </Grid>
 
                         <Grid item xs={12} md={4} textAlign="right">
-                             <Typography variant="body1" sx={{ mb: 2 }}>
+                            <Typography variant="body1" sx={{ mb: 2 }}>
                                 Contáctanos: info@perfumes.com
                             </Typography>
                             <Button variant="contained" sx={{ bgcolor: 'primary.main', '&:hover': { bgcolor: 'primary.dark' } }}>
