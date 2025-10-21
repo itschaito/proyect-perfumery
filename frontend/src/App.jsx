@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { Box } from '@mui/material';
 
-// Importaciones (Verifica tus rutas)
+// Corregir el navbar de netlify
 import Navbar from './components/navbar';
 import Footer from './components/Footer'; 
 import Home from './pages/Home';
