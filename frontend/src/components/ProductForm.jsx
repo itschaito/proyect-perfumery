@@ -6,9 +6,12 @@ import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom'; // Para obtener el ID
 import { useAuth } from '../context/useAuth'; 
 
-// URLs absolutas
-const API_BASE_URL = 'http://localhost:5000/api/admin/productos'; // POST, PUT (Token)
-const API_PUBLIC_URL = 'http://localhost:5000/api/productos'; // GET (Sin Token)
+// DEFINE LA URL PÚBLICA DE TU BACKEND DE RENDER
+const BACKEND_URL = 'https://proyect-perfumery-1.onrender.com'; // <--- ¡REEMPLAZA ESTA URL!
+
+// Cambia las URL de la API:
+const API_BASE_URL = `${BACKEND_URL}/api/admin/productos`; 
+const API_PUBLIC_URL = `${BACKEND_URL}/api/productos`;
 
 const ProductForm = ({ action = 'add' }) => {
     const { id } = useParams(); // ID solo existe si la ruta es /admin/editar/:id

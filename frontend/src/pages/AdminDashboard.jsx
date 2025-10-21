@@ -10,9 +10,15 @@ import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../context/useAuth'; 
 
-// --- URLs ABSOLUTAS CORREGIDAS PARA CONSISTENCIA ---
-const API_PRODUCTS_URL = 'http://localhost:5000/api/productos'; // GET público
-const API_ADMIN_URL = 'http://localhost:5000/api/admin/productos'; // Rutas CRUD
+// frontend/src/pages/AdminDashboard.jsx
+
+// DEFINE LA URL PÚBLICA DE TU BACKEND DE RENDER
+const BACKEND_URL = 'https://proyect-perfumery-1.onrender.com'; // <--- ¡REEMPLAZA ESTA URL!
+
+// Cambia las URL de la API:
+const API_PRODUCTS_URL = `${BACKEND_URL}/api/productos`; // GET público
+const API_ADMIN_URL = `${BACKEND_URL}/api/admin/productos`; // Rutas CRUD
+// ... (resto del código)
 
 const AdminDashboard = () => {
     const [products, setProducts] = useState([]);

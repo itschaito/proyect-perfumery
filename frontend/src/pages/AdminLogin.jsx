@@ -5,8 +5,11 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/useAuth'; 
 import axios from 'axios'; 
 
-// URL de tu endpoint de login (ajusta si es necesario)
-const LOGIN_API_URL = '/api/auth/login';
+
+const BACKEND_URL = 'https://proyect-perfumery-1.onrender.com'; // <--- ¡REEMPLAZA ESTA URL!
+
+// Cambia las URL de la API:
+const LOGIN_API_URL = `${BACKEND_URL}/api/auth/login`;
 
 const AdminLogin = () => {
     const [username, setUsername] = useState('admin'); // Puedes pre-llenar el usuario para facilitar las pruebas

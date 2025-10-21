@@ -11,7 +11,9 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api/productos'; 
+const BACKEND_URL = 'https://proyect-perfumery-1.onrender.com';
+
+const API_URL = `${BACKEND_URL}/api/productos`;
 
 // Estilo del Modal
 const modalStyle = {
