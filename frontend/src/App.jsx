@@ -4,7 +4,7 @@ import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-route
 import { Box } from '@mui/material';
 
 // Importaciones (Verifica tus rutas)
-import Navbar from './components/Navbar';
+import Navbar from './components/navbar';
 import Footer from './components/Footer'; 
 import Home from './pages/Home';
 import AdminLogin from './pages/AdminLogin';
