@@ -8,7 +8,7 @@ import { useAuth } from '../context/useAuth';
 
 // ⚠️ CAMBIO CRÍTICO: Usar el puerto local del backend (5000)
 // Esto debe cambiarse a 'https://tu-url-render.onrender.com' antes de desplegar
-const BACKEND_URL = 'http://localhost:5000'; 
+const BACKEND_URL = 'https://proyect-perfumery.onrender.com'; 
 
 // URLs de la API
 const API_BASE_URL = `${BACKEND_URL}/api/admin/productos`; 
