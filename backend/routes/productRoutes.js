@@ -1,105 +1,119 @@
-// backend/routes/productRoutes.js (REVISADO Y CONFIRMADO)
+// backend/routes/productRoutes.js (¡MIGRADO A MONGOOSE!)
 const express = require('express');
 const router = express.Router();
-const auth = require('../middleware/auth'); // Asegúrate que la ruta a tu middleware sea correcta
-const fs = require('fs/promises');
-const path = require('path');
-
-// Definición de la ruta al archivo JSON
-const PRODUCTS_FILE = path.join(__dirname, '..', 'data', 'productos.json');
-
-// --- Funciones de Utilidad para Leer/Escribir ---\r\n
-const readProducts = async () => {
-    try {
-        const data = await fs.readFile(PRODUCTS_FILE, 'utf-8');
-        return JSON.parse(data);
-    } catch (error) {
-        return [];
-    }
-};
-
-const writeProducts = async (products) => {
-    await fs.writeFile(PRODUCTS_FILE, JSON.stringify(products, null, 2), 'utf-8');
-};
+const auth = require('../middleware/auth'); // Middleware para proteger rutas
+// ⚠️ IMPORTAMOS EL MODELO DE MONGOOSE
+const Product = require('../models/Product'); 
 
 // ------------------------------------------------
+// --- RUTAS PÚBLICAS (Cliente) ---
+// ------------------------------------------------
 
-// RUTAS PÚBLICAS (Cliente)
+// GET /api/productos -> Obtener todos los productos
 router.get('/productos', async (req, res) => {
-    const products = await readProducts();
-    res.json(products);
+    try {
+        const products = await Product.find({});
+        res.json(products);
+    } catch (error) {
+        console.error('❌ Error al obtener productos de MongoDB:', error);
+        res.status(500).json({ message: 'Error interno del servidor al cargar el catálogo.' });
+    }
 });
 
-// RUTAS PROTEGIDAS (Admin)
+// GET /api/productos/:id -> Obtener un producto por ID
+router.get('/productos/:id', async (req, res) => {
+    try {
+        // En tu frontend ProductForm.jsx usa el _id de MongoDB para la edición
+        const product = await Product.findById(req.params.id); 
+        if (!product) {
+            return res.status(404).json({ message: 'Producto no encontrado.' });
+        }
+        res.json(product);
+    } catch (error) {
+        console.error('❌ Error al obtener producto por ID:', error);
+        res.status(400).json({ message: 'Formato de ID inválido.' }); 
+    }
+});
+
+
+// ------------------------------------------------
+// --- RUTAS PROTEGIDAS (Admin) ---
+// ------------------------------------------------
 
 // POST /api/admin/productos -> Crear un nuevo producto
-router.post('/admin/productos', auth, async (req, res) => { // Protegida con 'auth'
+router.post('/admin/productos', auth, async (req, res) => {
     try {
-        const products = await readProducts();
+        const { name, price, image, stock, notes, description } = req.body;
         
-        // Lógica para asignar nuevo ID
-        const newId = products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1;
-        
-        // Lógica para formatear notas
-        const notesArray = typeof req.body.notes === 'string' ? req.body.notes.split(/[\s,]+/).filter(Boolean) : [];
+        // El frontend ya envía las notas como un array de strings si se siguen las instrucciones de ProductForm
+        const notesArray = Array.isArray(notes) ? notes : notes.split(/[\s,]+/).filter(Boolean);
 
-        // Crear el nuevo producto
-        const newProduct = {
-            id: newId,
-            ...req.body,
-            price: Number(req.body.price),
-            stock: Number(req.body.stock),
-            notes: notesArray, 
-            createdAt: new Date().toISOString()
-        };
+        const newProduct = new Product({
+            name,
+            price: Number(price),
+            image,
+            stock: Number(stock),
+            notes: notesArray,
+            description,
+        });
 
-        products.push(newProduct);
-        await writeProducts(products);
-        res.status(201).json(newProduct);
+        const savedProduct = await newProduct.save(); // Guarda en MongoDB Atlas
+        res.status(201).json(savedProduct);
 
     } catch (error) {
-        console.error('Error al crear el producto:', error);
-        res.status(500).json({ message: 'Error interno del servidor al guardar el producto.' });
+        console.error('❌ Error al crear el producto en MongoDB:', error);
+        if (error.name === 'ValidationError') {
+            return res.status(400).json({ message: 'Error de validación: Revise los campos requeridos.' });
+        }
+        if (error.code === 11000) { // Error de índice único (nombre duplicado)
+            return res.status(400).json({ message: 'Ya existe un producto con este nombre.' });
+        }
+        res.status(500).json({ message: 'Error interno del servidor al crear producto.' });
     }
 });
 
 // PUT /api/admin/productos/:id -> Actualizar un producto existente
-router.put('/admin/productos/:id', auth, async (req, res) => { // Protegida con 'auth'
-    const products = await readProducts();
-    const id = parseInt(req.params.id);
-    const index = products.findIndex(p => p.id === id);
+router.put('/admin/productos/:id', auth, async (req, res) => {
+    try {
+        const updateData = {
+            price: Number(req.body.price),
+            stock: Number(req.body.stock),
+            // Los demás campos (name, image, notes, description) se mantienen fijos según tu ProductForm.jsx
+        };
 
-    if (index === -1) return res.status(404).json({ message: 'Producto no encontrado' });
-    
-    let updatedData = { ...req.body };
-    
-    // Asegura que los campos numéricos y las notas se manejen correctamente
-    if (updatedData.price) updatedData.price = Number(updatedData.price);
-    if (updatedData.stock) updatedData.stock = Number(updatedData.stock);
-    if (updatedData.notes && typeof updatedData.notes === 'string') {
-        updatedData.notes = updatedData.notes.split(/[\s,]+/).filter(Boolean);
+        const updatedProduct = await Product.findByIdAndUpdate(
+            req.params.id, 
+            { $set: updateData },
+            { new: true, runValidators: true }
+        );
+
+        if (!updatedProduct) {
+            return res.status(404).json({ message: 'Producto no encontrado.' });
+        }
+        
+        res.json(updatedProduct);
+        
+    } catch (error) {
+        console.error('❌ Error al actualizar producto:', error);
+        res.status(500).json({ message: 'Error interno del servidor al actualizar producto.' });
     }
-    
-    products[index] = { ...products[index], ...updatedData, id: id };
-    
-    await writeProducts(products);
-    res.json(products[index]);
 });
 
 // DELETE /api/admin/productos/:id -> Eliminar un producto
-router.delete('/admin/productos/:id', auth, async (req, res) => { // Protegida con 'auth'
-    let products = await readProducts();
-    const id = parseInt(req.params.id);
-    
-    const initialLength = products.length;
-    products = products.filter(p => p.id !== id);
+router.delete('/admin/productos/:id', auth, async (req, res) => {
+    try {
+        const result = await Product.findByIdAndDelete(req.params.id);
 
-    if (products.length === initialLength) {
-        return res.status(404).json({ message: 'Producto no encontrado.' });
+        if (!result) {
+            return res.status(404).json({ message: 'Producto no encontrado.' });
+        }
+        
+        res.status(204).send(); 
+        
+    } catch (error) {
+        console.error('❌ Error al eliminar producto:', error);
+        res.status(500).json({ message: 'Error interno del servidor al eliminar producto.' });
     }
-    
-    await writeProducts(products);
-    res.json({ message: 'Producto eliminado con éxito.' });
 });
 
 module.exports = router;

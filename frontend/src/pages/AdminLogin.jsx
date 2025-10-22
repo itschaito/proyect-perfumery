@@ -6,7 +6,7 @@ import { useAuth } from '../context/useAuth';
 import axios from 'axios'; 
 
 
-const BACKEND_URL = 'https://proyect-perfumery-1.onrender.com'; // <--- ¡REEMPLAZA ESTA URL!
+const BACKEND_URL = 'http://localhost:5000'; // <--- ¡REEMPLAZA ESTA URL!
 
 // Cambia las URL de la API:
 const LOGIN_API_URL = `${BACKEND_URL}/api/auth/login`;

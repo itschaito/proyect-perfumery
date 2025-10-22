@@ -13,7 +13,7 @@ import { useAuth } from '../context/useAuth';
 // frontend/src/pages/AdminDashboard.jsx
 
 // DEFINE LA URL PÚBLICA DE TU BACKEND DE RENDER
-const BACKEND_URL = 'https://proyect-perfumery-1.onrender.com'; // <--- ¡REEMPLAZA ESTA URL!
+const BACKEND_URL = 'http://localhost:5000'; // <--- ¡REEMPLAZA ESTA URL!
 
 // Cambia las URL de la API:
 const API_PRODUCTS_URL = `${BACKEND_URL}/api/productos`; // GET público

@@ -11,7 +11,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import axios from 'axios';
 
-const BACKEND_URL = 'https://proyect-perfumery-1.onrender.com';
+const BACKEND_URL = 'http://localhost:5000';
 
 const API_URL = `${BACKEND_URL}/api/productos`;
 
